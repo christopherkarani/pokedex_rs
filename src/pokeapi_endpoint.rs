@@ -26,14 +26,14 @@ impl PokeAPIEndpoint {
     /// # Arguments
     /// *`pokemon_name`- the name of the pokemon you want to look up
     ///
-    fn construct_pokemon_enpoint(&self, pokemon_name: &str) -> PokeAPIEndpoint {
+    fn construct_pokemon_endpoint(&self, pokemon_name: &str) -> PokeAPIEndpoint {
         let path = String::from("/pokemon");
         let endpoint = format!("{}/{}", path, pokemon_name);
         self.make_pokeapi_endpoint(endpoint.as_str())
     }
 
     pub fn get_pokemon(&self, name: &str) {
-        let endpoint = self.construct_pokemon_enpoint(name);
+        let endpoint = self.construct_pokemon_endpoint(name);
         let endpoint_path = endpoint.path;
 
 //        let response = reqwest::get(endpoint_path).await;
