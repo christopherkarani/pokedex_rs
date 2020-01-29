@@ -1,4 +1,3 @@
-
 static BASE_URL: &str = "https://pokeapi.co/api/v2";
 
 /// Use this to build endpoints from the PokeApi
@@ -10,7 +9,9 @@ impl PokeAPIEndpoint {
     /// create an instance of the endpoint builder
     /// uses the base url: `"https://pokeapi.co/api/v2"`
     pub fn build() -> PokeAPIEndpoint {
-        PokeAPIEndpoint { path: String::from(BASE_URL), }
+        PokeAPIEndpoint {
+            path: String::from(BASE_URL),
+        }
     }
     /// Use this to create an endpoint from the
     /// # Arguments
@@ -32,12 +33,14 @@ impl PokeAPIEndpoint {
         self.make_pokeapi_endpoint(endpoint.as_str())
     }
 
-    pub fn get_pokemon(&self, name: &str) {
+    pub fn get_pokemon(&self, name: &str) -> PokeAPIEndpoint {
         let endpoint = self.construct_pokemon_endpoint(name);
-        let endpoint_path = endpoint.path;
+        PokeAPIEndpoint {
+            path: endpoint.path,
+        }
+    }
 
-//        let response = reqwest::get(endpoint_path).await;
-        println!("getting pokemon");
-        println!("Endpoint: {}", endpoint_path);
+    pub fn get_path(&self) -> String {
+        self.path.clone()
     }
 }
