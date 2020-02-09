@@ -1,6 +1,12 @@
+#[macro_use]
 extern crate reqwest;
 extern crate serde_json;
+extern crate serde;
+extern crate serde_derive;
 extern crate tokio;
+
+
+use serde::{Serialize, Deserialize};
 
 
 mod pokeapi_endpoint;
@@ -37,41 +43,48 @@ impl PokeRegion {
 }
 
 
-
+#[derive(Serialize, Deserialize, Debug)]
 struct Language {
     name: String,
     url: String
 }
+
+#[derive(Serialize, Deserialize, Debug)]
 struct Description {
     description: String
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 struct PokeDexName {
     name: String,
     language: Language
 }
 
-
+#[derive(Serialize, Deserialize, Debug)]
 struct PokemonResource {
     name: String,
     url: String
 }
+#[derive(Serialize, Deserialize, Debug)]
 struct PokeDexEntries {
     entry_number: i32,
     pokemon_species: PokemonResource
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 struct NamedResource {
     name: String,
     url: String
 }
+
+#[derive(Serialize, Deserialize, Debug)]
 struct PokeDexResponse {
     id: i32,
     name: String,
     is_main_series: bool,
     names: Vec<PokeDexName>,
     descriptions: Vec<Description>,
-    entries: Vec<PokeDexEntries>,
+    pokemon_entries: Vec<PokeDexEntries>,
     version_groups: Vec<NamedResource>
 }
 
@@ -91,11 +104,12 @@ async fn get_pokemon(name: &str, endpoint: PokeAPIEndpoint) -> String {
 
     response
 }
-
-async fn get_pokedex(region: PokeRegion, endpoint_manager: PokeAPIEndpoint) -> String {
+/// Gets the pokedex response from the poke api server
+async fn get_pokedex(region: PokeRegion, endpoint_manager: PokeAPIEndpoint) -> PokeDexResponse {
     let endpoint_manager = endpoint_manager.construct_pokedex_entry_endpoint(region.get_string().as_str());
     let endpoint = endpoint_manager.get_path();
     println!("Endpoint: {}", endpoint);
     let body = reqwest::get(endpoint.as_str()).await.unwrap().text().await.unwrap();
-    body
+    let pokedex_response: PokeDexResponse = serde_json::from_str(body.as_str()).unwrap();
+    pokedexResponse
 }
