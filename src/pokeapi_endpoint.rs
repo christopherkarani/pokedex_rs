@@ -33,12 +33,23 @@ impl PokeAPIEndpoint {
         self.make_pokeapi_endpoint(endpoint.as_str())
     }
 
+    pub fn construct_pokedex_entry_endpoint(&self, pokemon_name: &str) -> PokeAPIEndpoint {
+        let path = String::from("/pokedex");
+        let endpoint = format!("{}/{}", path, pokemon_name);
+        self.make_pokeapi_endpoint(endpoint.as_str())
+    }
+
+
+
     pub fn get_pokemon(&self, name: &str) -> PokeAPIEndpoint {
         let endpoint = self.construct_pokemon_endpoint(name);
         PokeAPIEndpoint {
             path: endpoint.path,
         }
     }
+
+
+
 
     pub fn get_path(&self) -> String {
         self.path.clone()
