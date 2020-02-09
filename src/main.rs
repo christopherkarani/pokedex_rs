@@ -26,18 +26,61 @@ impl PokeRegion {
     fn get_string(&self) -> String {
         match self {
             PokeRegion::National => "national".to_string(),
-            _ => "Nothing".to_string()
+            PokeRegion::Kanto => "kanto".to_string(),
+            PokeRegion::Johto => "johto".to_string(),
+            PokeRegion::Hoenn => "hoenn".to_string(),
+            PokeRegion::Unova => "unove".to_string(),
+            PokeRegion::Kalos => "kalos".to_string(),
+            PokeRegion::Sinnoh => "sinnoh".to_string()
         }
     }
 }
 
 
 
+struct Language {
+    name: String,
+    url: String
+}
+struct Description {
+    description: String
+}
+
+struct PokeDexName {
+    name: String,
+    language: Language
+}
+
+
+struct PokemonResource {
+    name: String,
+    url: String
+}
+struct PokeDexEntries {
+    entry_number: i32,
+    pokemon_species: PokemonResource
+}
+
+struct NamedResource {
+    name: String,
+    url: String
+}
+struct PokeDexResponse {
+    id: i32,
+    name: String,
+    is_main_series: bool,
+    names: Vec<PokeDexName>,
+    descriptions: Vec<Description>,
+    entries: Vec<PokeDexEntries>,
+    version_groups: Vec<NamedResource>
+}
+
+
 #[tokio::main]
 async fn main()   {
     println!("Hello World");
     let endpoint_manager = PokeAPIEndpoint::build();
-    let pokedex_entry = get_pokedex(PokeRegion::National, endpoint_manager).await;
+    let pokedex_entry = get_pokedex(PokeRegion::Kanto, endpoint_manager).await;
     println!("{}", pokedex_entry);
 }
 
