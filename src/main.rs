@@ -88,28 +88,60 @@ struct PokeDexResponse {
     version_groups: Vec<NamedResource>
 }
 
+impl PokeDexResponse {
+    fn get_entries(mut self) -> Vec<PokeDexEntries> {
+        self.pokemon_entries
+    }
+
+    fn check_entries_count(mut self) -> Result<Vec<PokeDexEntries>, PokeError> {
+        if self.get_entries().iter().count() > 0 {
+            return Ok(self.pokemon_entries)
+        } else {
+            let error = PokeError {
+                details: String::from("no pokemon entries found")
+            };
+            return Err(error)
+        }
+    }
+}
+
 
 #[tokio::main]
 async fn main()   {
     println!("Hello World");
+    let pokemon_name = String::from("pikachu");
     let endpoint_manager = PokeAPIEndpoint::build();
-    let pokedex_entry = get_pokedex(PokeRegion::Kanto, endpoint_manager).await;
-    println!("{}", pokedex_entry);
+    let pokedex_response = get_pokedex(PokeRegion::National, endpoint_manager).await;
+    let pokemon_count = pokedex_response.pokemon_entries.iter().count();
+    let pokemon_entry = pokedex_response
+        .check_entries_count()
+        .unwrap()
+        .iter()
+        .filter(|&p| p.pokemon_species.name == pokemon_name)
+        .next()
+        .unwrap();
+
+
+    println!("name: {} \n url: {}", pokemon_entry.pokemon_species.name, pokemon_entry.pokemon_species.url)
 }
 
 async fn get_pokemon(name: &str, endpoint: PokeAPIEndpoint) -> String {
     let endpoint = endpoint.get_pokemon(name).get_path();
     println!("Endpoint: {}", endpoint);
     let response = reqwest::get(endpoint.as_str()).await.unwrap().text().await.unwrap();
-
     response
 }
+
+fn transform_poke_respons_to_entries(response: PokeDexResponse) -> Vec<PokeDexEntries> {
+    response.pokemon_entries
+}
+
+
 /// Gets the pokedex response from the poke api server
 async fn get_pokedex(region: PokeRegion, endpoint_manager: PokeAPIEndpoint) -> PokeDexResponse {
     let endpoint_manager = endpoint_manager.construct_pokedex_entry_endpoint(region.get_string().as_str());
     let endpoint = endpoint_manager.get_path();
-    println!("Endpoint: {}", endpoint);
     let body = reqwest::get(endpoint.as_str()).await.unwrap().text().await.unwrap();
     let pokedex_response: PokeDexResponse = serde_json::from_str(body.as_str()).unwrap();
-    pokedexResponse
+    pokedex_response
 }
